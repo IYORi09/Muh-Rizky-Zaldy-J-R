@@ -1,30 +1,26 @@
-from flask import Flask , render_template
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-@app.route("/")
-def home():
-    return "Hello, gaes!"
-
-@app.route('/about')
-def about():
-    return render_template('about.html')
-
-@app.route('/nama/<string:nama>')
-def getnama(nama):
-    return "nama anda adalah {}".format(nama)
-
-@app.route('/user/<name>')  
-def user(name):
-    return f"Hello, {name}!"
-
-@app.route('/user/<int:user_id>')  
-def user_id(user_id):
-    return f"User ID: {user_id}"
-
-@app.route('/profile/<name>')
-def profile(name):
-    return render_template('profile.html', username=name)
+@app.route("/", methods=["GET", "POST"])
+def index():
+    er = None
+    if request.method == "POST":
+        try:
+            likes = int(request.form["likes"])
+            comments = int(request.form["comments"])
+            shares = int(request.form["shares"])
+            followers = int(request.form["followers"])
+            
+            if followers == 0:
+                return "Jumlah followers tidak boleh 0!"
+            
+            er = ((likes + comments + shares) / followers) * 100
+        
+        except ValueError:
+            return "input tidak valid! Masukkan angka yang benar."
+    
+    return render_template("index.html", er=round(er, 2) if er is not None else None)
 
 if __name__ == "__main__":
     app.run(debug=True)
